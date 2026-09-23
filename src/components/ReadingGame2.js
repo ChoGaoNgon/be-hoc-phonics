@@ -2,6 +2,8 @@ import { MdArrowBackIosNew } from "react-icons/md"
 import { useNavigate } from "react-router-dom"
 import { useState, useContext } from "react"
 import { pointsContext } from "./PointsProvider";
+import { CHE_DO } from "../censtu/sdk";
+import { useNhatKyVan } from "../censtu/useNhatKyVan";
 
 const ReadingGame2 = () => {
     const navigate = useNavigate()
@@ -206,8 +208,10 @@ const ReadingGame2 = () => {
     const [answered, setAnswered] = useState()
     const [cantContinue, setCantContinue] = useState(true)
     const incrementalPoints = useContext(pointsContext)[1]
+    const { ghi, ketThuc, batDauLai } = useNhatKyVan(CHE_DO.DOC_TU_PHASE_5)
 
     function newGame() {
+        batDauLai()
         setdisplayEndPage(false)
         setCurrentQuestion(0)
         setQuizQuestions(shuffleSounds())
@@ -223,10 +227,12 @@ const ReadingGame2 = () => {
         else {
             setdisplayEndPage(true)
             incrementalPoints()
+            ketThuc()
         }
     }
 
-    const handleAnswer = (isCorrect) => {
+    const handleAnswer = (isCorrect, answerText) => {
+        ghi(quizQuestions[currentQuestion].word, answerText, isCorrect)
         const trueAnswer = "Correct ✅"
         const falseAnswer = "Try again ❌"
         if (isCorrect === true) {
@@ -260,7 +266,7 @@ const ReadingGame2 = () => {
                     <div className="quiz-options">
                         { quizQuestions[currentQuestion].answerOptions.map((answer, index) => {                     
                             return (
-                            <div className="sound reading-card" onClick={() => handleAnswer(answer.isCorrect)}>
+                            <div className="sound reading-card" onClick={() => handleAnswer(answer.isCorrect, answer.answerImg)}>
                                 <img className="reading-images" src={`../images/phase5-reading/${answer.answerImg}.png`} alt={answer.answerImg} />
                             </div>
                             )})
@@ -269,7 +275,7 @@ const ReadingGame2 = () => {
                     <p className="quiz-tip">{answered}</p>
                     <button className="next-btn" disabled={cantContinue} onClick={handleNextBtnClick}>Next</button>    
                 </div>
-                <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik">Freepik</a> from <a href="www.flaticon.com">www.flaticon.com</a></footer>
+                <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
             </>
             )}
         </section> 

@@ -2,6 +2,8 @@ import { MdArrowBackIosNew } from "react-icons/md"
 import { useNavigate } from "react-router-dom"
 import { useState, useContext } from "react"
 import { pointsContext } from "./PointsProvider";
+import { CHE_DO } from "../censtu/sdk";
+import { useNhatKyVan } from "../censtu/useNhatKyVan";
 
 const PhaseTwoQuiz= () => {
     const navigate = useNavigate()
@@ -117,9 +119,11 @@ const PhaseTwoQuiz= () => {
     const [answered, setAnswered] = useState()
     const [cantContinue, setCantContinue] = useState(true)
     const incrementalPoints = useContext(pointsContext)[1]
+    const { ghi, ketThuc, batDauLai } = useNhatKyVan(CHE_DO.QUIZ_PHASE_2)
 
 
     function newGame() {
+        batDauLai()
         setdisplayEndPage(false)
         setCurrentQuestion(0)
         setQuizQuestions(shuffleSounds())
@@ -135,10 +139,12 @@ const PhaseTwoQuiz= () => {
         else {
             setdisplayEndPage(true)
             incrementalPoints()
+            ketThuc()
         }
     }
 
-    const handleAnswer = (isCorrect) => {
+    const handleAnswer = (isCorrect, answerText) => {
+        ghi(quizQuestions[currentQuestion].image, answerText, isCorrect)
         const trueAnswer = "Correct ✅"
         const falseAnswer = "Try again ❌"
         if (isCorrect === true) {
@@ -173,7 +179,7 @@ const PhaseTwoQuiz= () => {
                         { quizQuestions[currentQuestion].answerOptions.map((answer, index) => {    
                                                      
                             return (
-                                <div className="sound" onClick={() => handleAnswer(answer.isCorrect)}>
+                                <div className="sound" onClick={() => handleAnswer(answer.isCorrect, answer.answerText)}>
                                 <p>{answer.answerText}</p>
                             </div>
                             )})
@@ -182,7 +188,7 @@ const PhaseTwoQuiz= () => {
                     <p className="quiz-tip">{answered}</p>
                     <button className="next-btn" disabled={cantContinue} onClick={handleNextBtnClick}>Next</button>    
                 </div>
-                <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik">Freepik</a> from <a href="www.flaticon.com">www.flaticon.com</a></footer>
+                <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
             </>
             )}
         </section> 

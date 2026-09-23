@@ -48,5 +48,25 @@ Before installation, please make sure you have already installed following tools
 4. Install dependencies with `npm install`
 5. Run `npm start`
 
+## 🎮 CenStu game portal
+
+Game được nhúng vào kho trò chơi [game.censtu.com](https://game.censtu.com) và chạy độc lập ở
+`https://phonics.censtu.com` (Cloudflare Workers, cấu hình ở `wrangler.jsonc`; build ra `build/`).
+
+- `src/censtu/sdk.js` — hợp đồng `postMessage` với portal (bản chép; bản chính tắc ở repo CENSTU
+  `fe-censtu/shared/src/types/troChoiNhung.ts`). Mỗi mini-game trong "Games" là một chế độ; một lượt
+  chơi tới màn "Well done!" là một ván.
+- `public/_headers` — chỉ `game.censtu.com` được nhúng game.
+- `public/card-banner.html` — mặt thẻ 800×600 trên portal; `?the=1` chỉ vẽ tranh, không chữ.
+
+Nghiệm thu và xuất ảnh thẻ (skill [`censtu-them-game`](https://github.com/ChoGaoNgon/skill-create-censtu-game)):
+
+```bash
+npm run build
+node ~/.claude/skills/censtu-them-game/scripts/kiem-nhung.mjs --dist ./build \
+  --kich-ban ./scripts/kich-ban-nghiem-thu.js
+node ~/.claude/skills/censtu-them-game/scripts/xuat-anh-the.mjs --dist ./build --slug be-hoc-phonics
+```
+
 ## Show your support
 Give a ⭐️ if this project helps you or you like it.

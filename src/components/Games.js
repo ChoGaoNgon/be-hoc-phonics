@@ -5,7 +5,7 @@ import Points from "./Points";
 const Games = () => {
     const navigate = useNavigate()
     return ( 
-        <section>
+        <section className="games-page">
             <header>    
                   <p onClick={() => navigate(-1)}><MdArrowBackIosNew className="back-arrow" /></p>                
                   <h1>Games</h1>

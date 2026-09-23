@@ -2,10 +2,13 @@ import { useState, useContext } from "react";
 import {MdArrowBackIosNew} from "react-icons/md"
 import { useNavigate } from "react-router-dom"
 import { pointsContext } from "./PointsProvider";
+import { CHE_DO } from "../censtu/sdk";
+import { useNhatKyVan } from "../censtu/useNhatKyVan";
 
 const MatchingGame = () => {
   const navigate = useNavigate();
   const incrementalPoints = useContext(pointsContext)[1]
+  const { ghi, ketThuc, batDauLai } = useNhatKyVan(CHE_DO.GHEP_CAP)
 
   const sounds = [
         { id: 1, letter: "h", icon: "hat" },
@@ -39,6 +42,7 @@ const MatchingGame = () => {
    const [pairOfSounds, setPairOfSounds] = useState(shuffleCards);
 
   function newGame() {
+    batDauLai()
     setOpenedCard([])
     setMatched([])
     setFinished(null)
@@ -46,6 +50,13 @@ const MatchingGame = () => {
   }
 
     function flipCard(index) {
+        // Mỗi lượt lật thẻ THỨ HAI là một lượt trả lời. Ghi ngoài updater của `setOpenedCard`:
+        // updater có thể bị React gọi lặp, còn nhật ký thì chỉ được ghi một lần.
+        if (openedCard.length === 1) {
+          const first = pairOfSounds[openedCard[0]]
+          const second = pairOfSounds[index]
+          ghi(first.letter || first.icon, second.letter || second.icon, first.id === second.id)
+        }
         setOpenedCard((opened) => {
           if (openedCard.length === 2) {return opened}
           const merged = [...opened, index]
@@ -71,6 +82,7 @@ const MatchingGame = () => {
           if (matched.length === 5) {
               setFinished(wellDone)
               incrementalPoints()
+              ketThuc()
           }
 
           return merged
@@ -111,7 +123,7 @@ const MatchingGame = () => {
                 })}
             </div>
             {finished}
-            <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik">Freepik</a> from <a href="www.flaticon.com">www.flaticon.com</a></footer>
+            <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
         </section>
      );
 }
