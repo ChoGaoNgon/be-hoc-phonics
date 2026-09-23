@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { MdArrowBackIosNew } from "react-icons/md"
+import { MdArrowBackIosNew, MdVolumeUp } from "react-icons/md"
 
 const PhaseThree = () => {
     const navigate = useNavigate()
@@ -134,7 +134,7 @@ const PhaseThree = () => {
                     // get random item from alternatingColor
                     const randomElement = {backgroundColor: alternatingColor[Math.floor(Math.random() * alternatingColor.length)]}
                     // apply to below as style...   
-                    return (<div className="sound" style={randomElement} onClick={start}><p>{sound.letter}</p></div>);
+                    return (<div className="sound" style={randomElement} onClick={start} title="Bấm để nghe"><MdVolumeUp className="loa" aria-hidden="true" /><p>{sound.letter}</p></div>);
                 })
             }
             </div>

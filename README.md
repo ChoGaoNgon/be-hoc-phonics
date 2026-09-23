@@ -17,6 +17,9 @@ npm start        # chạy dev
 npm run build    # build ra build/
 ```
 
+Thêm hoặc đổi tên file âm trong `public/sounds/` thì chạy `node scripts/kiem-am-thanh.mjs`: máy chủ deploy
+phân biệt chữ hoa/thường trong tên file (macOS thì không), sai một chữ là thẻ bấm vào im lặng.
+
 ## 🎮 CenStu game portal
 
 Game được nhúng vào kho trò chơi [game.censtu.com](https://game.censtu.com) và chạy độc lập ở
