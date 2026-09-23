@@ -52,6 +52,10 @@ function App() {
                   </Link>
               </section>
         <Points />
+        <p className="ghi-nguon">
+          Icon: <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> ·{" "}
+          <a href="https://www.flaticon.com" target="_top">Flaticon</a>
+        </p>
           </main>
     </div>
   );

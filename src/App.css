@@ -469,6 +469,18 @@ transform: scale(1.1);
     align-items: center;
   }
 
+/* Ghi nguồn icon — điều kiện của giấy phép miễn phí Flaticon. Nhỏ và mờ, nhưng phải có trên trang. */
+.ghi-nguon {
+  margin-top: 0.75em;
+  font-size: 0.7rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.ghi-nguon a {
+  text-decoration: underline;
+}
+
 /* =================== CENSTU =================== */
 
 /* Thanh về kho + chân trang: chỉ hiện khi chạy độc lập (KhungCenstu.js). */

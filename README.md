@@ -37,6 +37,11 @@ node ~/.claude/skills/censtu-them-game/scripts/kiem-nhung.mjs --dist ./build \
 node ~/.claude/skills/censtu-them-game/scripts/xuat-anh-the.mjs --dist ./build --slug be-hoc-phonics
 ```
 
+## Nguồn hình ảnh
+
+Icon do [Freepik](https://www.flaticon.com/authors/freepik) thiết kế, lấy từ [Flaticon](https://www.flaticon.com)
+(giấy phép miễn phí, bắt buộc ghi nguồn; dòng ghi nguồn trong app nằm cuối Trang chủ).
+
 ## Giấy phép
 
 MIT, xem [LICENSE](LICENSE).
