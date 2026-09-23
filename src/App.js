@@ -11,7 +11,7 @@ function App() {
   return (
     <div className="App">
       <main>
-           <div className="heading"><img src="./images/bee-logo.png" alt="bee logo" className="title-image" /><h1 className="title">buzz<span className="title-span">phonics</span></h1></div>
+           <div className="heading"><img src="./images/bee-logo.png" alt="bee logo" className="title-image" /><h1 className="title">Bé học <span className="title-span">phonics</span></h1></div>
               <Greeting />
               <section className="home-section">
                   <Link to="phaseTwo">
@@ -52,6 +52,10 @@ function App() {
                   </Link>
               </section>
         <Points />
+        <p className="ghi-nguon">
+          Icon: <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> ·{" "}
+          <a href="https://www.flaticon.com" target="_top">Flaticon</a>
+        </p>
           </main>
     </div>
   );

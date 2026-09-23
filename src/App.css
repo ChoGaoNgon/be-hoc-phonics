@@ -152,6 +152,21 @@ header {
   cursor: pointer;
 }
 
+/* Thẻ âm ở trang Phase 2/3/5 bấm được để nghe — icon loa ở góc cho bé và phụ huynh biết điều đó. */
+.sound-container .sound {
+  position: relative;
+}
+
+.loa {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
 .sound p {
   font-size: 2rem;
   font-weight: 600;
@@ -163,12 +178,6 @@ header {
   padding: 6px 0;
 }
 
-
-footer {
-  font-size: 0.8rem;
-  text-align: center;
-  margin-top: 4em;
-}
 
 /* ============== GAMES ============= */
 
@@ -474,6 +483,18 @@ transform: scale(1.1);
     justify-content: center;
     align-items: center;
   }
+
+/* Ghi nguồn icon — điều kiện của giấy phép miễn phí Flaticon. Nhỏ và mờ, nhưng phải có trên trang. */
+.ghi-nguon {
+  margin-top: 0.75em;
+  font-size: 0.7rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.ghi-nguon a {
+  text-decoration: underline;
+}
 
 /* =================== CENSTU =================== */
 

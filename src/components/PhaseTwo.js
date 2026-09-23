@@ -1,4 +1,4 @@
-import { MdArrowBackIosNew } from "react-icons/md"
+import { MdArrowBackIosNew, MdVolumeUp } from "react-icons/md"
 import { MdFlipCameraAndroid } from "react-icons/md"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
@@ -150,14 +150,13 @@ const PhaseTwo = () => {
                       }
 
                     if (displayIcons) {
-                        return (<div className="sound" style={randomElement} onClick={start}><img src= {`../images/${sound.icon}.png`} alt={sound.icon} className="sound-icon"/></div>);
+                        return (<div className="sound" style={randomElement} onClick={start} title="Bấm để nghe"><MdVolumeUp className="loa" aria-hidden="true" /><img src= {`../images/${sound.icon}.png`} alt={sound.icon} className="sound-icon"/></div>);
                     } else {
-                        return (<div className="sound" style={randomElement} onClick={start}><p>{sound.letter}</p></div>);
+                        return (<div className="sound" style={randomElement} onClick={start} title="Bấm để nghe"><MdVolumeUp className="loa" aria-hidden="true" /><p>{sound.letter}</p></div>);
                     }
                 })
             }
             </div>
-            <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
         </section>
      );
 }
