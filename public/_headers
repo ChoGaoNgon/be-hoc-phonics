@@ -1,0 +1,7 @@
+# Chỉ portal CenStu được nhúng game — game nhúng ở site lạ vẫn bắn điểm về CenStu.
+/*
+  Content-Security-Policy: frame-ancestors https://game.censtu.com
+
+# File trong /static/ mang hash trong tên: đổi nội dung là đổi tên, nên cache vĩnh viễn được.
+/static/*
+  Cache-Control: public, max-age=31536000, immutable

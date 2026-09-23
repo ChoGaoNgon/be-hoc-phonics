@@ -474,3 +474,94 @@ transform: scale(1.1);
     justify-content: center;
     align-items: center;
   }
+
+/* =================== CENSTU =================== */
+
+/* Thanh về kho + chân trang: chỉ hiện khi chạy độc lập (KhungCenstu.js). */
+.ve-kho {
+  display: block;
+  margin-bottom: 0.75em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-blue);
+}
+
+.chan-trang {
+  margin-top: 1.5em;
+  padding-bottom: 1em;
+  font-size: 0.8rem;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.chan-trang a {
+  text-decoration: underline;
+}
+
+/*
+ * Bố cục nhúng — hợp đồng của portal: khung rộng 100% × cao `100dvh − 44px` (1366×768 ⇒ 724px),
+ * game phải vừa khung KHÔNG cuộn. `<html>` mang class `nhung` khi chạy trong iframe (index.js).
+ * `.khung-chinh` cuộn được chỉ là lưới an toàn: màn chơi chính phải vừa mà không cần nó.
+ */
+html.nhung,
+html.nhung body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html.nhung body {
+  margin: 0 auto;
+  height: 100dvh;
+}
+
+html.nhung #root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+html.nhung .khung-chinh {
+  flex: 1;
+  /* `min-height: 0` là điều kiện để `flex: 1` co lại được: thiếu nó, flex item lấy chiều cao nội
+     dung làm sàn và cả trang tràn ra ngoài khung thay vì cuộn bên trong. */
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  padding: 0.75em 1em;
+}
+
+/*
+ * Hai màn menu gọn lại khi nhúng: trang chủ là màn ĐẦU TIÊN người chơi thấy trong portal, và ở
+ * khổ 1366×768 nó cuộn 123px (Games: 249px) với bố cục một cột của điện thoại. Lưới 2 cột ⇒ vừa khung.
+ */
+html.nhung .home-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1em;
+  margin-top: 1em;
+}
+
+html.nhung .home-section .phase-two,
+html.nhung .home-section .phase-three,
+html.nhung .home-section .phase-five,
+html.nhung .home-section .quiz-button {
+  width: auto;
+  height: 120px;
+  margin: 0;
+}
+
+html.nhung .games-page {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75em;
+}
+
+html.nhung .games-page > header,
+html.nhung .games-page > div {
+  grid-column: 1 / -1;
+}
+
+html.nhung .games-page .games-button {
+  width: auto;
+  margin: 0;
+}

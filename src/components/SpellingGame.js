@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"
 import {sounds} from "./Sounds"
 import { useState, useContext } from "react"
 import { pointsContext } from "./PointsProvider";
+import { CHE_DO } from "../censtu/sdk";
+import { useNhatKyVan } from "../censtu/useNhatKyVan";
 
 const SpellingGame = () => {
     const navigate = useNavigate()
@@ -55,10 +57,12 @@ const SpellingGame = () => {
     const [cantContinue, setCantContinue] = useState(true)
     const [displayEndPage, setdisplayEndPage] = useState(false)
     const incrementalPoints = useContext(pointsContext)[1]
+    const { ghi, ketThuc, batDauLai } = useNhatKyVan(CHE_DO.DANH_VAN_PHASE_2)
 
     const handleCardClick = (sound) => {
         const current = deck[currentCard]
         const nextSound = current.sounds[currentPosition]
+        ghi(current.word, sound, nextSound?.sound === sound)
 
         if (nextSound.sound === sound) {
             deck[currentCard].sounds[currentPosition].found = true;
@@ -79,10 +83,12 @@ const SpellingGame = () => {
         } else {
           setdisplayEndPage(true)
           incrementalPoints()
+          ketThuc()
         }
     }
 
     const newGame = () => {
+        batDauLai()
         setDeck(cardDeck.sort(() => Math.random() - 0.5).slice(0,3).map(item => setupDeck(item)))
         setCurrentCard(0)
         setCurrentPosition(0)
@@ -129,7 +135,7 @@ const SpellingGame = () => {
                     </div>
                     <button className="next-btn" disabled={cantContinue} onClick={handleNext}>Next</button>    
                 </div>
-                <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik">Freepik</a> from <a href="www.flaticon.com">www.flaticon.com</a></footer>
+                <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
                </>
                 )}
         </section> 

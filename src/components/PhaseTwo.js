@@ -157,7 +157,7 @@ const PhaseTwo = () => {
                 })
             }
             </div>
-            <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik">Freepik</a> from <a href="www.flaticon.com">www.flaticon.com</a></footer>
+            <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
         </section>
      );
 }

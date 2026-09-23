@@ -16,9 +16,15 @@ import Games from "./components/Games"
 import PointsProvider  from './components/PointsProvider';
 import ReadingGame from "./components/ReadingGame"
 import ReadingGame2 from "./components/ReadingGame2"
+import KhungCenstu from "./censtu/KhungCenstu"
+import { dangNhungTrongPortal } from "./censtu/sdk"
+
+// Gắn trước lượt render đầu để bố cục nhúng không nháy bố cục độc lập — xem App.css § CENSTU.
+if (dangNhungTrongPortal()) document.documentElement.classList.add("nhung")
 
 render(
   <BrowserRouter>
+         <KhungCenstu>
          <PointsProvider>
        <Routes>
           <Route path="/" element={<App />} />
@@ -35,6 +41,7 @@ render(
           <Route path="games/readingGame2" element={<ReadingGame2 />} />
        </Routes>
        </PointsProvider>
+         </KhungCenstu>
   </BrowserRouter>,
   document.getElementById('root')
 );

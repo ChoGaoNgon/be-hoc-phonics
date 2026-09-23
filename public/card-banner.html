@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bé học Phonics - Game Card & Banner Generator (800x600) | CenStu.com</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
+  <!--
+    Mặt thẻ của game trên kho trò chơi CenStu (game.censtu.com) — khuôn theo kid-vocab/public/card-banner.html.
+
+    🔴 `?the=1` (Portal Mode): CHỈ vẽ tranh. Portal cấm chữ QUẢNG CÁO và TÊN GAME trong ảnh thẻ
+    (CENSTU:fe-censtu/web-game/public/anh-tro-choi/NGUON.md) — tên game là chữ DOM đè ở ĐÁY thẻ.
+    Chữ cái trên các thẻ âm (s a t p i n, c/d/f/s) là NỘI DUNG của game, giữ lại — cùng tiền lệ
+    phương trình của dau-truong-tim-x và thẻ từ của kid-vocab.
+
+    Mọi chuyển động tuần hoàn theo CHU_KY = 4s, đúng độ dài clip mặt thẻ ⇒ clip lặp không giật.
+
+    Xuất ảnh/clip cho portal:
+      npm run build
+      node ~/.claude/skills/censtu-them-game/scripts/xuat-anh-the.mjs --dist ./build --slug be-hoc-phonics
+  -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #16263a;
+      color: #f8fafc;
+      font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Portal Mode: Only show canvas without any UI wrapper for automated capture */
+    body.portal-mode {
+      padding: 0;
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    body.portal-mode .ui-container {
+      display: none !important;
+    }
+
+    body.portal-mode #canvas-wrapper {
+      box-shadow: none;
+      border: none;
+      border-radius: 0;
+    }
+
+    .ui-container {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .header-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #1F354B;
+      padding: 12px 20px;
+      border-radius: 16px;
+      border: 1px solid #36557a;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #F7BF31, #F878B5, #6B74E0);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(247, 191, 49, 0.4);
+    }
+
+    .brand-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title span.blue { color: #6CDFEF; }
+    .brand-title span.orange { color: #F7BF31; }
+
+    .brand-sub {
+      font-size: 11px;
+      color: #a5b8cc;
+      font-weight: 600;
+    }
+
+    .controls-grid {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, a.btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #F7BF31, #f59e0b);
+      color: #1F354B;
+      box-shadow: 0 4px 14px rgba(247, 191, 49, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(247, 191, 49, 0.5);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #F878B5, #6B74E0);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(107, 116, 224, 0.35);
+    }
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(107, 116, 224, 0.5);
+    }
+
+    .btn-outline {
+      background: #294461;
+      color: #e2e8f0;
+      border: 1px solid #3f6189;
+    }
+    .btn-outline:hover {
+      background: #36557a;
+      color: #fff;
+    }
+
+    .btn-recording {
+      background: #dc2626 !important;
+      color: #fff !important;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+      to { transform: scale(1.04); box-shadow: 0 0 25px rgba(220, 38, 38, 0.9); }
+    }
+
+    #canvas-wrapper {
+      position: relative;
+      width: 800px;
+      height: 600px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(247, 191, 49, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: #000;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 800px;
+      height: 600px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #294461;
+      border-radius: 999px;
+      overflow: hidden;
+      display: none;
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6CDFEF, #F7BF31, #F878B5);
+      transition: width 0.1s linear;
+    }
+
+    .info-footer {
+      font-size: 12px;
+      color: #7f93a8;
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.6;
+    }
+    .info-footer a {
+      color: #a5b8cc;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 840px) {
+      #canvas-wrapper {
+        transform: scale(0.45);
+        transform-origin: top center;
+        margin-bottom: -320px;
+      }
+    }
+    @media (min-width: 600px) and (max-width: 840px) {
+      #canvas-wrapper {
+        transform: scale(0.72);
+        margin-bottom: -160px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Container (Hidden in ?the=1 portal mode) -->
+  <div class="ui-container">
+    <div class="header-bar">
+      <div class="brand">
+        <div class="brand-icon">CS</div>
+        <div>
+          <div class="brand-title"><span class="blue">Cen</span><span class="orange">Stu</span>.com</div>
+          <div class="brand-sub">Bé học Phonics Card & Video Exporter (800x600)</div>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <button id="btn-toggle-text" class="btn-outline">
+          <span id="text-mode-icon">🔤</span>
+          <span id="text-mode-label">Tắt Chữ (Text Off)</span>
+        </button>
+
+        <button id="btn-download-png" class="btn-primary">
+          <span>📸</span> Tải PNG (800x600)
+        </button>
+
+        <button id="btn-record-webm" class="btn-secondary">
+          <span id="record-icon">🎬</span>
+          <span id="record-label">Quay WebM (4s - 60FPS)</span>
+        </button>
+
+        <a href="?the=1" class="btn-link btn-outline" target="_blank" title="Chế độ portal CenStu chụp card tự động">
+          <span>🌐</span> Portal Mode (?the=1)
+        </a>
+
+        <a href="https://game.censtu.com" class="btn-link btn-outline" target="_blank">
+          <span>🎮</span> Kho Game
+        </a>
+      </div>
+    </div>
+
+    <div class="progress-bar-container" id="progress-container">
+      <div class="progress-bar" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Canvas Wrapper (Fixed 800x600) -->
+  <div id="canvas-wrapper">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+  </div>
+
+  <div class="info-footer ui-container">
+    ⚡ <b>Bé học Phonics Banner Exporter</b> • Kích thước chuẩn: <b>800 × 600 px</b> @ 60 FPS • Bản quyền thuộc <b>CenStu.com</b><br>
+    Chế độ Portal: Thêm <code>?the=1</code> vào URL để tắt toàn bộ text & UI controls phục vụ chụp và nhúng thẻ game.
+  </div>
+
+  <script>
+    // --- Configuration & URL Parameters ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPortalMode = urlParams.get('the') === '1';
+
+    if (isPortalMode) {
+      document.body.classList.add('portal-mode');
+    }
+
+    let renderText = !isPortalMode;
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // UI Buttons
+    const btnDownloadPng = document.getElementById('btn-download-png');
+    const btnRecordWebm = document.getElementById('btn-record-webm');
+    const btnToggleText = document.getElementById('btn-toggle-text');
+    const textModeLabel = document.getElementById('text-mode-label');
+    const textModeIcon = document.getElementById('text-mode-icon');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const recordLabel = document.getElementById('record-label');
+    const recordIcon = document.getElementById('record-icon');
+
+    if (btnToggleText) {
+      btnToggleText.addEventListener('click', () => {
+        renderText = !renderText;
+        if (renderText) {
+          textModeLabel.textContent = 'Tắt Chữ (Text Off)';
+          textModeIcon.textContent = '🔤';
+        } else {
+          textModeLabel.textContent = 'Bật Chữ (Text On)';
+          textModeIcon.textContent = '🖼️';
+        }
+      });
+    }
+
+    // --- Bảng màu của chính game (src/App.css :root) ---
+    const MAU = {
+      navyDam: '#1F354B',
+      navy: '#294461',
+      green: '#11C684',
+      purple: '#6B74E0',
+      pink: '#F878B5',
+      blue: '#0671D5',
+      yellow: '#F7BF31',
+      lightBlue: '#6CDFEF',
+      ink: '#3f3f40',
+    };
+
+    // Mọi chuyển động tuần hoàn theo chu kỳ này — bằng đúng độ dài clip mặt thẻ ⇒ clip lặp liền mạch.
+    const CHU_KY = 4;
+    const TAU = Math.PI * 2;
+    const song = (time, k = 1, lech = 0) => Math.sin(TAU * (time / CHU_KY) * k + lech);
+
+    // --- Hình của game (bóng đen trên thẻ xanh nhạt, y như màn Matching) ---
+    const hinh = {};
+    for (const ten of ['cat', 'sun', 'frog', 'duck']) {
+      const img = new Image();
+      img.src = `images/${ten}.png`;
+      hinh[ten] = img;
+    }
+
+    // Thẻ lật: mặt chữ ↔ mặt hình, lệch pha nhau — đúng trò "Matching sounds".
+    const flipCards = [
+      { letter: 'c', icon: 'cat',  x: 132, y: 168, lech: 0.0,  tilt: -0.10 },
+      { letter: 's', icon: 'sun',  x: 668, y: 168, lech: 0.25, tilt: 0.10 },
+      { letter: 'f', icon: 'frog', x: 118, y: 336, lech: 0.5,  tilt: 0.08 },
+      { letter: 'd', icon: 'duck', x: 682, y: 336, lech: 0.75, tilt: -0.08 },
+    ];
+
+    // Hàng thẻ âm "s a t p i n" — bộ âm đầu tiên của Phase 2; từng thẻ nảy lên và "phát âm" lần lượt.
+    const soundTiles = [
+      { letter: 's', color: MAU.pink },
+      { letter: 'a', color: MAU.yellow },
+      { letter: 't', color: MAU.lightBlue },
+      { letter: 'p', color: MAU.green },
+      { letter: 'i', color: MAU.purple },
+      { letter: 'n', color: MAU.pink },
+    ];
+
+    // Ngẫu nhiên có hạt giống: khung hình giống nhau mỗi lần mở ⇒ ảnh thẻ xuất lại không đổi.
+    let seed = 7;
+    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+    const pollen = Array.from({ length: 46 }, () => ({
+      x: rand() * 800,
+      y: rand() * 600,
+      r: rand() * 2.2 + 0.8,
+      k: 1 + Math.floor(rand() * 2),
+      lech: rand() * TAU,
+      alpha: rand() * 0.5 + 0.25,
+    }));
+
+    const flowers = [
+      { x: 70,  y: 560, r: 26, color: MAU.pink,   k: 1, lech: 0 },
+      { x: 190, y: 578, r: 20, color: MAU.purple, k: 1, lech: 1.2 },
+      { x: 300, y: 566, r: 16, color: MAU.lightBlue, k: 2, lech: 2.1 },
+      { x: 500, y: 570, r: 18, color: MAU.green,  k: 2, lech: 0.6 },
+      { x: 615, y: 580, r: 22, color: MAU.yellow, k: 1, lech: 2.8 },
+      { x: 735, y: 558, r: 26, color: MAU.pink,   k: 1, lech: 1.7 },
+    ];
+
+    function roundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+    }
+
+    function drawHex(cx, cy, r) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = Math.PI / 3 * i + Math.PI / 6;
+        const px = cx + r * Math.cos(a);
+        const py = cy + r * Math.sin(a);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+    }
+
+    function drawBlob(cx, cy, s, color, rot) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.scale(s, s);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(20, -170);
+      ctx.bezierCurveTo(110, -160, 120, -80, 160, -30);
+      ctx.bezierCurveTo(200, 20, 190, 120, 120, 160);
+      ctx.bezierCurveTo(40, 200, -90, 190, -150, 120);
+      ctx.bezierCurveTo(-200, 60, -180, -60, -120, -120);
+      ctx.bezierCurveTo(-80, -160, -40, -175, 20, -170);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Ong — cùng dáng logo của game (đầu vàng, thân sọc, cánh xám), thêm má hồng và nụ cười.
+    function drawBee(x, y, s, tilt, wing) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(tilt);
+      ctx.scale(s, s);
+
+      // Cánh (vỗ: co giãn theo trục dọc)
+      ctx.save();
+      ctx.fillStyle = 'rgba(226, 232, 240, 0.85)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2;
+      for (const dir of [-1, 1]) {
+        ctx.save();
+        ctx.translate(dir * 14, 6);
+        ctx.rotate(dir * (0.55 + wing * 0.35));
+        ctx.beginPath();
+        ctx.ellipse(dir * 34, -8, 38, 20 + wing * 4, 0, 0, TAU);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // Thân sọc
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(0, 40, 30, 50, 0, 0, TAU);
+      ctx.fillStyle = MAU.yellow;
+      ctx.fill();
+      ctx.clip();
+      ctx.fillStyle = MAU.ink;
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.ellipse(0, 12 + i * 22, 40, 7, 0, 0, TAU);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Ngòi
+      ctx.fillStyle = MAU.ink;
+      ctx.beginPath();
+      ctx.moveTo(-6, 86);
+      ctx.lineTo(6, 86);
+      ctx.lineTo(0, 100);
+      ctx.closePath();
+      ctx.fill();
+
+      // Râu
+      ctx.strokeStyle = MAU.ink;
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      for (const dir of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(dir * 8, -40);
+        ctx.quadraticCurveTo(dir * 14, -70, dir * 26, -78);
+        ctx.stroke();
+        ctx.fillStyle = MAU.ink;
+        ctx.beginPath();
+        ctx.arc(dir * 26, -78, 5, 0, TAU);
+        ctx.fill();
+      }
+
+      // Đầu
+      ctx.fillStyle = MAU.yellow;
+      ctx.beginPath();
+      ctx.arc(0, -16, 30, 0, TAU);
+      ctx.fill();
+
+      // Mắt + đốm sáng
+      ctx.fillStyle = MAU.ink;
+      ctx.beginPath();
+      ctx.arc(-11, -20, 5, 0, TAU);
+      ctx.arc(11, -20, 5, 0, TAU);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(-12.5, -22, 1.8, 0, TAU);
+      ctx.arc(9.5, -22, 1.8, 0, TAU);
+      ctx.fill();
+
+      // Má hồng
+      ctx.fillStyle = 'rgba(248, 120, 181, 0.75)';
+      ctx.beginPath();
+      ctx.arc(-19, -8, 5.5, 0, TAU);
+      ctx.arc(19, -8, 5.5, 0, TAU);
+      ctx.fill();
+
+      // Miệng đang "phát âm"
+      ctx.fillStyle = '#9f1239';
+      ctx.beginPath();
+      ctx.ellipse(0, -5, 6, 4 + Math.abs(wing) * 2, 0, 0, Math.PI);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Vòng sóng âm lan ra từ (x, y); p ∈ [0, 1) là tiến độ của một nhịp.
+    function drawSoundRings(x, y, p, color) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineCap = 'round';
+      for (let i = 0; i < 3; i++) {
+        const q = (p + i / 3) % 1;
+        ctx.globalAlpha = (1 - q) * 0.8;
+        ctx.lineWidth = 4 * (1 - q) + 1;
+        ctx.beginPath();
+        ctx.arc(x, y, 20 + q * 60, -Math.PI * 0.8, -Math.PI * 0.2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFlipCard(card, time) {
+      // Góc lật đi hết một vòng mỗi chu kỳ: nửa đầu mặt chữ, nửa sau mặt hình.
+      const goc = TAU * (time / CHU_KY + card.lech);
+      const lat = Math.cos(goc);
+      const matChu = lat >= 0;
+      const w = 96, h = 96;
+      const bob = song(time, 1, card.lech * TAU) * 8;
+
+      ctx.save();
+      ctx.translate(card.x, card.y + bob);
+      ctx.rotate(card.tilt + song(time, 1, card.lech * TAU + 1) * 0.04);
+      ctx.scale(Math.max(0.04, Math.abs(lat)), 1);
+
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 8;
+      ctx.fillStyle = matChu ? MAU.pink : MAU.lightBlue;
+      roundRect(-w / 2, -h / 2, w, h, 18);
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      if (matChu) {
+        ctx.fillStyle = '#111';
+        ctx.font = '600 58px "Fredoka", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(card.letter, 0, 2);
+      } else {
+        const img = hinh[card.icon];
+        if (img.complete && img.naturalWidth) ctx.drawImage(img, -32, -32, 64, 64);
+      }
+      ctx.restore();
+    }
+
+    let startTime = performance.now();
+
+    // ==========================================
+    // MAIN RENDER LOOP (Procedural Canvas 60 FPS)
+    // ==========================================
+    function renderFrame(now) {
+      const time = (now - startTime) / 1000;
+
+      // ----------------------------------------------------
+      // LAYER 1: Nền navy của game + blob + tổ ong mờ
+      // ----------------------------------------------------
+      const bgGrad = ctx.createLinearGradient(0, 0, 800, 600);
+      bgGrad.addColorStop(0, '#16263a');
+      bgGrad.addColorStop(0.5, MAU.navyDam);
+      bgGrad.addColorStop(1, '#2b3f7a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 800, 600);
+
+      drawBlob(110 + song(time) * 10, 470, 1.25, 'rgba(41, 68, 97, 0.9)', 0.3);
+      drawBlob(700, 120 + song(time, 1, 1.5) * 10, 1.0, 'rgba(107, 116, 224, 0.22)', -0.6);
+      drawBlob(640, 520, 0.75, 'rgba(248, 120, 181, 0.16)', 1.1);
+
+      // Hào quang vàng sau con ong
+      const halo = ctx.createRadialGradient(400, 250, 10, 400, 250, 260);
+      halo.addColorStop(0, 'rgba(247, 191, 49, 0.38)');
+      halo.addColorStop(0.55, 'rgba(247, 191, 49, 0.08)');
+      halo.addColorStop(1, 'rgba(247, 191, 49, 0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, 800, 600);
+
+      // Tổ ong mờ
+      ctx.save();
+      ctx.strokeStyle = 'rgba(247, 191, 49, 0.09)';
+      ctx.lineWidth = 2;
+      const r = 34;
+      const dx = r * Math.sqrt(3);
+      for (let row = -1; row < 14; row++) {
+        for (let col = -1; col < 15; col++) {
+          const cx = col * dx + (row % 2 ? dx / 2 : 0);
+          const cy = row * r * 1.5;
+          drawHex(cx, cy, r);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+
+      // Phấn hoa lấp lánh
+      for (const p of pollen) {
+        const a = p.alpha + song(time, p.k, p.lech) * 0.25;
+        ctx.fillStyle = `rgba(254, 240, 138, ${Math.max(0.05, Math.min(1, a))})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y + song(time, 1, p.lech) * 6, p.r, 0, TAU);
+        ctx.fill();
+      }
+
+      // ----------------------------------------------------
+      // LAYER 2: Thẻ lật chữ ↔ hình
+      // ----------------------------------------------------
+      for (const card of flipCards) drawFlipCard(card, time);
+
+      // ----------------------------------------------------
+      // LAYER 3: Con ong bay vòng số 8 quanh tâm + đường bay chấm chấm
+      // ----------------------------------------------------
+      const beePos = (t) => {
+        const th = TAU * (t / CHU_KY);
+        return { x: 400 + Math.sin(th) * 70, y: 250 + Math.sin(th * 2) * 22 };
+      };
+
+      ctx.save();
+      for (let i = 1; i <= 26; i++) {
+        const p = beePos(time - i * 0.045);
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.55 * (1 - i / 26)})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y + 95, 3.2 * (1 - i / 40), 0, TAU);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      const bee = beePos(time);
+      const th = TAU * (time / CHU_KY);
+      const tilt = Math.cos(th) * 0.18;
+      const wing = Math.sin(TAU * (time / CHU_KY) * 16);
+      drawBee(bee.x, bee.y, 1.35, tilt, wing);
+
+      // ----------------------------------------------------
+      // LAYER 4: Hàng thẻ âm "s a t p i n", nảy lần lượt kèm sóng âm
+      // ----------------------------------------------------
+      const tileW = 64, gap = 14;
+      const rowW = soundTiles.length * tileW + (soundTiles.length - 1) * gap;
+      const x0 = 400 - rowW / 2 + tileW / 2;
+      const tileY = 404;
+      const nhip = CHU_KY / soundTiles.length;
+      const dangDoc = Math.floor((time % CHU_KY) / nhip);
+      const tienDo = ((time % CHU_KY) % nhip) / nhip;
+
+      soundTiles.forEach((tile, i) => {
+        const x = x0 + i * (tileW + gap);
+        const active = i === dangDoc;
+        const nay = active ? Math.sin(tienDo * Math.PI) : 0;
+        const y = tileY - nay * 22;
+        const s = 1 + nay * 0.12;
+
+        if (active) drawSoundRings(x, y - 34, tienDo, tile.color);
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.shadowColor = active ? tile.color : 'rgba(0, 0, 0, 0.35)';
+        ctx.shadowBlur = active ? 24 : 10;
+        ctx.shadowOffsetY = active ? 0 : 5;
+        ctx.fillStyle = tile.color;
+        roundRect(-tileW / 2, -tileW / 2, tileW, tileW, 16);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = active ? '#fff' : 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = active ? 3 : 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#111';
+        ctx.font = '600 38px "Fredoka", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(tile.letter, 0, 2);
+        ctx.restore();
+      });
+
+      // ----------------------------------------------------
+      // LAYER 5: Cỏ + hoa ở đáy (dải này bị tên game của portal đè — chỉ để trang trí)
+      // ----------------------------------------------------
+      ctx.save();
+      const grass = ctx.createLinearGradient(0, 520, 0, 600);
+      grass.addColorStop(0, 'rgba(17, 198, 132, 0.0)');
+      grass.addColorStop(1, 'rgba(17, 198, 132, 0.35)');
+      ctx.fillStyle = grass;
+      ctx.fillRect(0, 520, 800, 80);
+      for (const f of flowers) {
+        const sway = song(time, f.k, f.lech) * 0.12;
+        ctx.save();
+        ctx.translate(f.x, f.y);
+        ctx.rotate(sway);
+        ctx.strokeStyle = MAU.green;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, 60);
+        ctx.stroke();
+        ctx.fillStyle = f.color;
+        for (let i = 0; i < 6; i++) {
+          ctx.save();
+          // hoa 6 cánh: xoay đúng 1/6 vòng mỗi chu kỳ ⇒ khung cuối trùng khung đầu
+          ctx.rotate((TAU / 6) * (i + time / CHU_KY));
+          ctx.beginPath();
+          ctx.ellipse(0, -f.r * 0.7, f.r * 0.42, f.r * 0.7, 0, 0, TAU);
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.fillStyle = MAU.yellow;
+        ctx.beginPath();
+        ctx.arc(0, 0, f.r * 0.42, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // ----------------------------------------------------
+      // LAYER 6: Tiêu đề, dòng phụ, huy hiệu (CHỈ khi bật chữ — tắt hẳn ở ?the=1)
+      // ----------------------------------------------------
+      if (renderText) {
+        ctx.save();
+
+        // Top Brand Pill: CenStu.com
+        const brandX = 400;
+        const brandY = 34;
+        ctx.fillStyle = 'rgba(22, 38, 58, 0.85)';
+        ctx.strokeStyle = 'rgba(108, 223, 239, 0.6)';
+        ctx.lineWidth = 1.5;
+        roundRect(brandX - 120, brandY - 15, 240, 30, 15);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = 'bold 13px "Fredoka", sans-serif';
+        ctx.textBaseline = 'middle';
+        // Đo từng đoạn rồi xếp liền nhau — căn tay theo toạ độ thì hở/chồng tuỳ font đã nạp hay chưa.
+        const brandParts = [['CEN', MAU.lightBlue], ['STU', MAU.yellow], ['.COM • GAME', '#a5b8cc']];
+        const brandW = brandParts.reduce((w, [t]) => w + ctx.measureText(t).width, 0);
+        let bx = brandX - brandW / 2;
+        ctx.textAlign = 'left';
+        for (const [t, color] of brandParts) {
+          ctx.fillStyle = color;
+          ctx.fillText(t, bx, brandY);
+          bx += ctx.measureText(t).width;
+        }
+        ctx.textAlign = 'center';
+
+        // Main Title
+        const titleY = 84;
+        ctx.font = '700 46px "Fredoka", sans-serif';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillText('Bé học Phonics', 400, titleY + 4);
+        const titleGrad = ctx.createLinearGradient(240, 0, 560, 0);
+        titleGrad.addColorStop(0, '#fde68a');
+        titleGrad.addColorStop(0.5, MAU.yellow);
+        titleGrad.addColorStop(1, '#fb923c');
+        ctx.fillStyle = titleGrad;
+        ctx.fillText('Bé học Phonics', 400, titleY);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.strokeText('Bé học Phonics', 400, titleY);
+
+        // Subtitle pill
+        const subY = 124;
+        const subW = 330;
+        ctx.fillStyle = 'rgba(248, 120, 181, 0.92)';
+        roundRect(400 - subW / 2, subY - 14, subW, 28, 14);
+        ctx.fill();
+        ctx.font = 'bold 14px "Fredoka", sans-serif';
+        ctx.fillStyle = '#fff';
+        ctx.fillText('NGHE ÂM • GHÉP CHỮ • ĐÁNH VẦN', 400, subY + 1);
+
+        // Bottom Badges Row
+        const badgeY = 548;
+        const badges = [
+          { text: '🎮 7 trò chơi', color: MAU.lightBlue },
+          { text: '🔤 Phase 2 · 3 · 5', color: MAU.yellow },
+          { text: '🔊 Bấm để nghe âm', color: MAU.pink },
+        ];
+        const itemW = 190;
+        const startX = 400 - (itemW * 3 + 30) / 2 + itemW / 2;
+        badges.forEach((b, idx) => {
+          const bx = startX + idx * (itemW + 15);
+          ctx.fillStyle = 'rgba(22, 38, 58, 0.88)';
+          ctx.strokeStyle = b.color;
+          ctx.lineWidth = 2;
+          roundRect(bx - itemW / 2, badgeY - 16, itemW, 32, 12);
+          ctx.fill();
+          ctx.stroke();
+          ctx.font = 'bold 13px "Fredoka", sans-serif';
+          ctx.fillStyle = '#fff';
+          ctx.fillText(b.text, bx, badgeY + 1);
+        });
+
+        ctx.restore();
+      }
+
+      // ----------------------------------------------------
+      // LAYER 7: Viền vàng mật ong
+      // ----------------------------------------------------
+      ctx.save();
+      const borderGrad = ctx.createLinearGradient(0, 0, 800, 600);
+      borderGrad.addColorStop(0, MAU.yellow);
+      borderGrad.addColorStop(0.5, MAU.pink);
+      borderGrad.addColorStop(1, MAU.lightBlue);
+      ctx.strokeStyle = borderGrad;
+      ctx.lineWidth = 6;
+      roundRect(10, 10, 780, 580, 20);
+      ctx.stroke();
+      ctx.restore();
+
+      requestAnimationFrame(renderFrame);
+    }
+
+    // Start Rendering loop immediately
+    requestAnimationFrame(renderFrame);
+
+    // ==========================================
+    // EXPORTER 1: Tải ảnh PNG (800x600)
+    // ==========================================
+    if (btnDownloadPng) {
+      btnDownloadPng.addEventListener('click', () => {
+        const dataUrl = canvas.toDataURL('image/png', 1.0);
+        const link = document.createElement('a');
+        link.download = `be-hoc-phonics-card-800x600-${Date.now()}.png`;
+        link.href = dataUrl;
+        link.click();
+      });
+    }
+
+    // ==========================================
+    // EXPORTER 2: Quay Video WebM (4 giây, 60 FPS)
+    // ==========================================
+    let isRecording = false;
+
+    if (btnRecordWebm) {
+      btnRecordWebm.addEventListener('click', () => {
+        if (isRecording) return;
+        isRecording = true;
+
+        btnRecordWebm.classList.add('btn-recording');
+        recordLabel.textContent = 'Đang quay (4s)...';
+        recordIcon.textContent = '🔴';
+        progressContainer.style.display = 'block';
+        progressFill.style.width = '0%';
+
+        const stream = canvas.captureStream(60); // 60 FPS Canvas Stream
+
+        let mimeType = 'video/webm;codecs=vp9';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm;codecs=vp8';
+        }
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm';
+        }
+
+        let mediaRecorder;
+        try {
+          mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
+        } catch (e) {
+          mediaRecorder = new MediaRecorder(stream);
+        }
+
+        const chunks = [];
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            chunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.download = `be-hoc-phonics-card-800x600-${Date.now()}.webm`;
+          a.href = url;
+          a.click();
+          URL.revokeObjectURL(url);
+
+          // Reset UI
+          isRecording = false;
+          btnRecordWebm.classList.remove('btn-recording');
+          recordLabel.textContent = 'Quay WebM (4s - 60FPS)';
+          recordIcon.textContent = '🎬';
+          progressContainer.style.display = 'none';
+        };
+
+        const durationMs = CHU_KY * 1000;
+        const intervalMs = 50;
+        let elapsed = 0;
+
+        mediaRecorder.start();
+
+        const timer = setInterval(() => {
+          elapsed += intervalMs;
+          const percent = Math.min(100, Math.round((elapsed / durationMs) * 100));
+          progressFill.style.width = `${percent}%`;
+
+          if (elapsed >= durationMs) {
+            clearInterval(timer);
+            mediaRecorder.stop();
+          }
+        }, intervalMs);
+      });
+    }
+  </script>
+</body>
+</html>
