@@ -275,7 +275,6 @@ const ReadingGame2 = () => {
                     <p className="quiz-tip">{answered}</p>
                     <button className="next-btn" disabled={cantContinue} onClick={handleNextBtnClick}>Next</button>    
                 </div>
-                <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
             </>
             )}
         </section> 

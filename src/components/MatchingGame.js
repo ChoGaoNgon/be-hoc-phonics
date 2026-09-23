@@ -123,7 +123,6 @@ const MatchingGame = () => {
                 })}
             </div>
             {finished}
-            <footer>Icons made by <a href="https://www.flaticon.com/authors/freepik" target="_top">Freepik</a> from <a href="https://www.flaticon.com" target="_top">www.flaticon.com</a></footer>
         </section>
      );
 }
