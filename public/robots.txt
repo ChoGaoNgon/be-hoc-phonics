@@ -1,3 +1,4 @@
-# https://www.robotstxt.org/robotstxt.html
+# Cho bot tải trang để đọc thẻ canonical trỏ về portal CenStu — đừng chặn crawl ở đây:
+# bot không tải được trang thì không thấy canonical, URL vẫn có thể bị index trơn.
 User-agent: *
-Disallow:
+Allow: /
